@@ -2677,6 +2677,11 @@ html&gt;body{padding:0}&lt;/style&gt;
 #magnit-live-prototype .v21-progress-message&gt;span{min-width:0}
 #magnit-live-prototype .v21-progress-message&gt;svg{width:12px;height:12px;flex:none}
 #magnit-live-prototype .v21-progress-group{color:#777}
+#magnit-live-prototype .ml-delivery-progress:has(.v21-progress-eta){border-radius:26px 26px 0 0;padding:8px 16px 6px;color:#3b3a3a;box-shadow:0 -4px 12px #00000014}
+#magnit-live-prototype .v21-progress-message:has(.v21-progress-eta){min-height:22px}
+#magnit-live-prototype .v21-progress-empty-copy{display:inline-flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:2px 4px;font-size:12px;line-height:16px;font-weight:400}
+#magnit-live-prototype .v21-progress-eta{display:inline-flex;align-items:center;min-height:22px;padding:0 8px;border-radius:999px;background:#62af00;color:#fff;font-weight:500;white-space:nowrap}
+#magnit-live-prototype .v21-progress-divider{flex:none;width:3px;height:3px;border-radius:50%;background:currentColor}
 #magnit-live-prototype .v21-progress-track{position:relative;height:18px;margin:1px 0 3px}
 #magnit-live-prototype .v21-progress-track[hidden]{display:none}
 #magnit-live-prototype .v21-progress-rail{position:absolute;left:0;right:0;height:8px;top:5px;border-radius:6px;background:#f1f1f1;overflow:hidden}
@@ -2692,8 +2697,9 @@ html&gt;body{padding:0}&lt;/style&gt;
 #magnit-live-prototype .v21-progress-lock{position:absolute;right:0;top:-1px;display:grid;place-items:center;width:22px;height:20px;background:#fff;border:1px solid #ffa6a6;border-radius:12px}
 #magnit-live-prototype .v21-progress-lock&gt;svg{width:13px;height:13px;stroke-width:2.2}
 #magnit-live-prototype .ml-delivery-progress+.ml-bottom-nav{border-radius:0}
-#magnit-live-prototype .ml-page:has(&gt;.ml-delivery-progress){--v21-nav-height:75px;--v21-progress-height:54px}
-#magnit-live-prototype .ml-page:has(&gt;.ml-delivery-progress[data-progress-phase=&quot;empty&quot;]),#magnit-live-prototype .ml-page:has(&gt;.ml-delivery-progress[data-progress-phase=&quot;restaurant&quot;]){--v21-progress-height:32px}
+#magnit-live-prototype .ml-page:has(&gt;.ml-delivery-progress){--v21-nav-height:84px;--v21-progress-height:54px}
+#magnit-live-prototype .ml-page:has(&gt;.ml-delivery-progress .v21-progress-eta){--v21-progress-height:36px}
+#magnit-live-prototype .ml-page:has(&gt;.ml-delivery-progress[data-progress-phase=&quot;restaurant&quot;]){--v21-progress-height:32px}
 #magnit-live-prototype .ml-page:has(&gt;.ml-delivery-progress) .ml-cart-float{bottom:calc(var(--v21-nav-height) + var(--v21-progress-height) + 12px)}
 @media(max-width:600px){#magnit-live-prototype .ml-page:has(&gt;.ml-delivery-progress){--v21-nav-height:54px}}
 @media(prefers-reduced-motion:reduce){#magnit-live-prototype .v21-progress-fill{transition:none}}
@@ -3536,6 +3542,12 @@ html[data-keyboard-open] #magnit-live-prototype .a39-delivery-footer{padding-bot
 #magnit-live-prototype .research-app-nav button:disabled{opacity:1}
 #magnit-live-prototype .research-app-nav button:not(.is-active){color:#757575}
 #magnit-live-prototype .research-app-nav button:not(.is-active)&gt;.ml-source-icon{filter:brightness(0) invert(46%)}
+#magnit-live-prototype .research-app-nav--delivery{min-height:84px;padding:4px 0 22px}
+#magnit-live-prototype .research-app-nav--delivery button{font-size:11px;line-height:14px}
+#magnit-live-prototype .research-app-nav--delivery button:not(.is-active){color:#747372}
+#magnit-live-prototype .research-app-nav--delivery button:not(.is-active)&gt;.ml-source-icon{filter:brightness(0) invert(54%)}
+#magnit-live-prototype .research-app-nav--delivery .ml-nav-promo{top:1px;left:calc(50% + 6px);font-size:11px;line-height:16px;padding:0 5px;border-radius:8px}
+#magnit-live-prototype .research-app-nav--delivery .ml-home-line{width:72px;height:2px;bottom:8px;background:#3b3a3a}
 
 #magnit-live-prototype .rha-top {
  position: relative;
@@ -4863,15 +4875,23 @@ function progressV21Labels(group){
  const maximum=group.tiers.at(-1).amount||group.minimum;
  return group.tiers.map((tier,index)=&gt;`&lt;span class=&quot;v21-progress-tier ${group.fee===tier.fee?&#x27;is-current&#x27;:&#x27;&#x27;} ${index===0?&#x27;is-first&#x27;:&#x27;&#x27;} ${index===group.tiers.length-1?&#x27;is-last&#x27;:&#x27;&#x27;}&quot; style=&quot;left:${index===0?0:Math.round(tier.amount/maximum*100)}%&quot;&gt;${index===0?sourceIcon(&#x27;bike&#x27;):&#x27;&#x27;}${money(tier.fee)}&lt;/span&gt;`).join(&#x27;&#x27;);
 }
+function progressV21EmptyEta(group){
+ return mono24Enabled()?mono24Store().minutes:timeLabels[group.time];
+}
+function progressV21EmptyMessage(group){
+ const minimum=money(group.minimum).replace(/\s+(?=\d)/g,&#x27;&#x27;);
+ return `&lt;span class=&quot;v21-progress-empty-copy&quot;&gt;&lt;span class=&quot;v21-progress-eta&quot;&gt;${esc(progressV21EmptyEta(group))}&lt;/span&gt;&lt;span class=&quot;v21-progress-divider&quot; aria-hidden=&quot;true&quot;&gt;&lt;/span&gt;&lt;span&gt;Заказ от ${esc(minimum)}&lt;/span&gt;&lt;/span&gt;${icon(&#x27;chevron-right&#x27;)}`;
+}
 function progressV21MessageHTML(group){
+ if(group.phase===&#x27;empty&#x27;)return progressV21EmptyMessage(group);
  const groups=deliveryGroups(),multiple=groups.length&gt;1||groups.length===1&amp;&amp;groups[0]!==group.time,prefix=splitV22Enabled()||multiple&amp;&amp;group.phase!==&#x27;minimum&#x27;?`&lt;span class=&quot;v21-progress-group&quot;&gt;${esc(timeLabels[group.time])} · &lt;/span&gt;`:&#x27;&#x27;;
  const eta=progressV21Shared()&amp;&amp;group.phase!==&#x27;minimum&#x27;&amp;&amp;!prefix?`&lt;span class=&quot;v21-progress-group&quot;&gt;${group.time===&#x27;fast&#x27;?&#x27;От 25 мин&#x27;:timeLabels[group.time]} · &lt;/span&gt;`:&#x27;&#x27;;
  return `&lt;span&gt;${prefix||eta}${esc(progressV21Message(group))}&lt;/span&gt;${icon(&#x27;chevron-right&#x27;)}`;
 }
 function progressV21BarMaximum(group){return group.phase===&#x27;minimum&#x27;?group.minimum:group.tiers.at(-1)?.amount||group.minimum;}
 function deliveryProgressView(){if(mono24Enabled())return mono24ProgressView();
- const group=progressV21Progress(),track=group.phase===&#x27;minimum&#x27;||group.phase===&#x27;delivery&#x27;;
- return `&lt;div class=&quot;ml-delivery-progress&quot; data-delivery-progress data-progress-time=&quot;${group.time}&quot; data-progress-phase=&quot;${group.phase}&quot;&gt;&lt;button type=&quot;button&quot; class=&quot;v21-progress-message&quot; data-progress-message data-action=&quot;conditions&quot; data-key=&quot;${group.time}&quot; aria-label=&quot;Условия доставки, ${esc(timeLabels[group.time])}. ${esc(progressV21Message(group))}&quot;&gt;${progressV21MessageHTML(group)}&lt;/button&gt;&lt;div class=&quot;v21-progress-track&quot; data-progress-track ${track?&#x27;&#x27;:&#x27;hidden&#x27;}&gt;&lt;div class=&quot;v21-progress-rail&quot; role=&quot;progressbar&quot; aria-label=&quot;${group.shortfall?&#x27;Минимальная сумма заказа&#x27;:&#x27;Снижение стоимости доставки&#x27;}&quot; aria-valuemin=&quot;0&quot; aria-valuemax=&quot;${progressV21BarMaximum(group)}&quot; aria-valuenow=&quot;${Math.min(group.amount,progressV21BarMaximum(group))}&quot; aria-valuetext=&quot;${esc(progressV21Message(group))}&quot;&gt;&lt;div class=&quot;v21-progress-fill&quot; style=&quot;width:${group.ratio*100}%&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;v21-progress-labels&quot;&gt;${progressV21Labels(group)}&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;`;
+ const group=progressV21Progress(),track=group.phase===&#x27;minimum&#x27;||group.phase===&#x27;delivery&#x27;,eta=group.phase===&#x27;empty&#x27;?progressV21EmptyEta(group):timeLabels[group.time];
+ return `&lt;div class=&quot;ml-delivery-progress&quot; data-delivery-progress data-progress-time=&quot;${group.time}&quot; data-progress-phase=&quot;${group.phase}&quot;&gt;&lt;button type=&quot;button&quot; class=&quot;v21-progress-message&quot; data-progress-message data-action=&quot;conditions&quot; data-key=&quot;${group.time}&quot; aria-label=&quot;Условия доставки, ${esc(eta)}. ${esc(progressV21Message(group))}&quot;&gt;${progressV21MessageHTML(group)}&lt;/button&gt;&lt;div class=&quot;v21-progress-track&quot; data-progress-track ${track?&#x27;&#x27;:&#x27;hidden&#x27;}&gt;&lt;div class=&quot;v21-progress-rail&quot; role=&quot;progressbar&quot; aria-label=&quot;${group.shortfall?&#x27;Минимальная сумма заказа&#x27;:&#x27;Снижение стоимости доставки&#x27;}&quot; aria-valuemin=&quot;0&quot; aria-valuemax=&quot;${progressV21BarMaximum(group)}&quot; aria-valuenow=&quot;${Math.min(group.amount,progressV21BarMaximum(group))}&quot; aria-valuetext=&quot;${esc(progressV21Message(group))}&quot;&gt;&lt;div class=&quot;v21-progress-fill&quot; style=&quot;width:${group.ratio*100}%&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;v21-progress-labels&quot;&gt;${progressV21Labels(group)}&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;`;
 }
 function refreshDeliveryProgress(){
  if(!page)return;if(mono24Enabled()){mono24RefreshProgress();return;}
@@ -4881,7 +4901,7 @@ function refreshDeliveryProgress(){
   if(node.classList.contains(&#x27;u25-progress&#x27;))return;
   node.dataset.progressTime=group.time;node.dataset.progressPhase=group.phase;
   const message=node.querySelector(&#x27;[data-progress-message]&#x27;),track=node.querySelector(&#x27;[data-progress-track]&#x27;),rail=node.querySelector(&#x27;.v21-progress-rail&#x27;),fill=node.querySelector(&#x27;.v21-progress-fill&#x27;),labels=node.querySelector(&#x27;.v21-progress-labels&#x27;);
-  if(message){message.innerHTML=progressV21MessageHTML(group);message.setAttribute(&#x27;aria-label&#x27;,`Условия доставки, ${timeLabels[group.time]}. ${progressV21Message(group)}`);}
+  if(message){const eta=group.phase===&#x27;empty&#x27;?progressV21EmptyEta(group):timeLabels[group.time];message.innerHTML=progressV21MessageHTML(group);message.setAttribute(&#x27;aria-label&#x27;,`Условия доставки, ${eta}. ${progressV21Message(group)}`);}
   if(track)track.hidden=![&#x27;minimum&#x27;,&#x27;delivery&#x27;].includes(group.phase);
   if(rail){rail.setAttribute(&#x27;aria-label&#x27;,group.shortfall?&#x27;Минимальная сумма заказа&#x27;:&#x27;Снижение стоимости доставки&#x27;);rail.setAttribute(&#x27;aria-valuemax&#x27;,String(progressV21BarMaximum(group)));rail.setAttribute(&#x27;aria-valuenow&#x27;,String(Math.min(group.amount,progressV21BarMaximum(group))));rail.setAttribute(&#x27;aria-valuetext&#x27;,progressV21Message(group));}
   if(fill)fill.style.width=group.ratio*100+&#x27;%&#x27;;if(labels)labels.innerHTML=progressV21Labels(group);
@@ -5131,7 +5151,11 @@ function mono24SearchResults(){
  const list=(items,insert)=&gt;items.length?`&lt;section class=&quot;ml-section ml-product-section&quot;&gt;${monoCrossGrid(items,{other:insert})}&lt;/section&gt;`:&#x27;&#x27;;
  return shelves?list(ps.slice(0,6),tile)+shelves+list(ps.slice(6)):ps.length?list(ps,tile):mono24Empty();
 }
-function mono24ProgressView(){const g=progressV21GroupState(progressV21CurrentTime()),track=[&#x27;minimum&#x27;,&#x27;delivery&#x27;].includes(g.phase);return `&lt;div class=&quot;ml-delivery-progress&quot; data-mono-progress&gt;&lt;button type=&quot;button&quot; class=&quot;v21-progress-message&quot; data-action=&quot;conditions&quot; aria-label=&quot;Условия доставки. ${esc(progressV21Message(g))}&quot;&gt;&lt;span&gt;${esc(progressV21Message(g))}&lt;/span&gt;${icon(&#x27;chevron-right&#x27;)}&lt;/button&gt;${track?`&lt;div class=&quot;v21-progress-track&quot;&gt;&lt;div class=&quot;v21-progress-rail&quot; role=&quot;progressbar&quot; aria-label=&quot;${g.shortfall?&#x27;Минимальная сумма заказа&#x27;:&#x27;Снижение стоимости доставки&#x27;}&quot; aria-valuemin=&quot;0&quot; aria-valuemax=&quot;${progressV21BarMaximum(g)}&quot; aria-valuenow=&quot;${Math.min(g.amount,progressV21BarMaximum(g))}&quot;&gt;&lt;div class=&quot;v21-progress-fill&quot; style=&quot;width:${g.ratio*100}%&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;v21-progress-labels&quot;&gt;${progressV21Labels(g)}&lt;/div&gt;&lt;/div&gt;`:&#x27;&#x27;}&lt;/div&gt;`;}
+function mono24ProgressView(){
+ const g=progressV21GroupState(progressV21CurrentTime()),empty=g.phase===&#x27;empty&#x27;,track=[&#x27;minimum&#x27;,&#x27;delivery&#x27;].includes(g.phase);
+ const message=esc(progressV21Message(g)),eta=empty?esc(progressV21EmptyEta(g))+&#x27;. &#x27;:&#x27;&#x27;;
+ return `&lt;div class=&quot;ml-delivery-progress&quot; data-mono-progress&gt;&lt;button type=&quot;button&quot; class=&quot;v21-progress-message&quot; data-action=&quot;conditions&quot; aria-label=&quot;Условия доставки. ${eta}${message}&quot;&gt;${empty?progressV21EmptyMessage(g):`&lt;span&gt;${message}&lt;/span&gt;${icon(&#x27;chevron-right&#x27;)}`}&lt;/button&gt;${track?`&lt;div class=&quot;v21-progress-track&quot;&gt;&lt;div class=&quot;v21-progress-rail&quot; role=&quot;progressbar&quot; aria-label=&quot;${g.shortfall?&#x27;Минимальная сумма заказа&#x27;:&#x27;Снижение стоимости доставки&#x27;}&quot; aria-valuemin=&quot;0&quot; aria-valuemax=&quot;${progressV21BarMaximum(g)}&quot; aria-valuenow=&quot;${Math.min(g.amount,progressV21BarMaximum(g))}&quot;&gt;&lt;div class=&quot;v21-progress-fill&quot; style=&quot;width:${g.ratio*100}%&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;v21-progress-labels&quot;&gt;${progressV21Labels(g)}&lt;/div&gt;&lt;/div&gt;`:&#x27;&#x27;}&lt;/div&gt;`;
+}
 function mono24RefreshProgress(){page.querySelectorAll(&#x27;[data-mono-progress]&#x27;).forEach(n=&gt;n.outerHTML=mono24ProgressView());const node=page.querySelector(&#x27;[data-mono-progress]&#x27;);if(node)page.style?.setProperty?.(&#x27;--v21-progress-height&#x27;,node.offsetHeight+&#x27;px&#x27;);icons();}
 function mono24SelectedSlot(time){
  const saved=state.slots[time];
@@ -6402,7 +6426,8 @@ function researchAppNav(active=&#x27;delivery&#x27;){
   [&#x27;delivery&#x27;,&#x27;delivery&#x27;,&#x27;Доставка&#x27;,active===&#x27;home&#x27;?&#x27;research-delivery&#x27;:&#x27;home&#x27;],
   [&#x27;cosmetic&#x27;,&#x27;cosmetic&#x27;,&#x27;М.Косметик&#x27;,&#x27;&#x27;]
  ];
- return `&lt;nav class=&quot;ml-bottom-nav research-app-nav&quot; aria-label=&quot;Навигация приложения&quot;&gt;${entries.map(([key,glyph,label,action])=&gt;`&lt;button type=&quot;button&quot; ${action?`data-action=&quot;${action}&quot;`:&#x27;disabled&#x27;} ${active===key?&#x27;class=&quot;is-active&quot; aria-current=&quot;page&quot;&#x27;:&#x27;&#x27;}&gt;${sourceIcon(glyph)}${key===&#x27;delivery&#x27;?&#x27;&lt;span class=&quot;ml-nav-promo&quot;&gt;−30%&lt;/span&gt;&#x27;:&#x27;&#x27;}${label}&lt;/button&gt;`).join(&#x27;&#x27;)}&lt;div class=&quot;ml-home-line&quot;&gt;&lt;/div&gt;&lt;/nav&gt;`;
+ if(active===&#x27;delivery&#x27;)entries.splice(3,0,[&#x27;finance&#x27;,&#x27;finance&#x27;,&#x27;Деньги&#x27;,&#x27;&#x27;]);
+ return `&lt;nav class=&quot;ml-bottom-nav research-app-nav${active===&#x27;delivery&#x27;?&#x27; research-app-nav--delivery&#x27;:&#x27;&#x27;}&quot; aria-label=&quot;Навигация приложения&quot;&gt;${entries.map(([key,glyph,label,action])=&gt;`&lt;button type=&quot;button&quot; ${action?`data-action=&quot;${action}&quot;`:&#x27;disabled&#x27;} ${active===key?&#x27;class=&quot;is-active&quot; aria-current=&quot;page&quot;&#x27;:&#x27;&#x27;}&gt;${sourceIcon(glyph)}${key===&#x27;delivery&#x27;?&#x27;&lt;span class=&quot;ml-nav-promo&quot;&gt;−30%&lt;/span&gt;&#x27;:&#x27;&#x27;}${label}&lt;/button&gt;`).join(&#x27;&#x27;)}&lt;div class=&quot;ml-home-line&quot;&gt;&lt;/div&gt;&lt;/nav&gt;`;
 }
 function researchStartRoute(){
  if(state.researchStarted)return;
@@ -7531,6 +7556,7 @@ address39?.install();
   #magnit-live-prototype .ml-home-line { display: none; }
   #magnit-live-prototype .ml-hero { padding-top: 16px; }
   #magnit-live-prototype .ml-bottom-nav { min-height: 54px; padding: 8px 4px; }
+  #magnit-live-prototype .research-app-nav--delivery { min-height: 54px; padding: 4px 0; }
   #magnit-live-prototype .ml-cart-float { bottom: 68px; }
   #magnit-live-prototype .ml-page:has(.ml-conditions) .ml-cart-float { bottom: 90px; }
   #magnit-live-prototype .ml-checkout-bar { padding-bottom: 12px; }
